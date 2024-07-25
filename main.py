@@ -1,17 +1,31 @@
 import argparse
+import requests
+from bs4 import BeautifulSoup
 
-# Create the parser
-parser = argparse.ArgumentParser(description="A simple argparse example")
+def scrape(url, output_file):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Example: Extract all text from paragraphs
+    paragraphs = soup.find_all('p')
+    with open(output_file, 'w') as file:
+        for para in paragraphs:
+            file.write(para.get_text() + '\n')
+    print(f"Scraping completed. Data saved to {output_file}")
 
-# Add arguments
-parser.add_argument('name', type=str, help="Your name")
-parser.add_argument('age', type=int, help="Your age")
-parser.add_argument('--greet', action='store_true', help="Print a greeting message")
+def main():
+    # Create the parser
+    parser = argparse.ArgumentParser(description="Web scraping script")
+    
+    # Add arguments
+    parser.add_argument('url', type=str, help="URL of the website to scrape")
+    parser.add_argument('output_file', type=str, help="File to save the scraped data")
+    
+    # Parse the arguments
+    args = parser.parse_args()
+    
+    # Call the scrape function with the provided arguments
+    scrape(args.url, args.output_file)
 
-# Parse the arguments
-args = parser.parse_args()
-
-# Use the arguments
-print(f"Hello, {args.name}! You are {args.age} years old.")
-if args.greet:
-    print("Nice to meet you!")
+if __name__ == "__main__":
+    main()
